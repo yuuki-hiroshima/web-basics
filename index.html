@@ -1,1 +1,194 @@
-test
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Web Baisics</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script defer src="script.js"></script>
+  </head>
+  <body>
+    <h1 id="title">配線テスト</h1>
+    <p class="main-text">これは段落です。</p>
+    <button id="btn">クリックして色変更</button>
+
+      <!-- リンクの基礎 -->
+      <h2>リンクの例</h2>
+      <p>こちらは <a href="https://www.google.com" target="_blank">Google</a> へのリンクです。</p>
+
+      <!-- リストの基礎 -->
+      <h2>リストの例</h2>
+      <!-- 順番なしリスト -->
+       <p>買い物リスト：</p>
+      <ul>
+        <li>りんご</li>
+        <li>ばなな</li>
+        <li>オレンジ</li>
+      </ul>
+      <!-- 順番ありリスト -->
+       <p>乗り物リスト：</p>
+      <ol>
+        <li>くるま</li>
+        <li>バイク</li>
+        <li>飛行機</li>
+      </ol>
+      <!-- ネスト（入れ子）したリスト -->
+       <p>学習項目（入れ子の例）：</p>
+       <ul>
+        <li>HTML
+          <ul>
+            <li>リンク</li>
+            <li>リスト</li>
+            <li>画像</li>
+          </ul>
+        </li>
+        <li>css</li>
+        <li>JavaScript</li>
+       </ul>
+
+      <!-- 画像の基礎 -->
+      <h2>画像の例</h2>
+      <img
+        src="https://d1d76jlpbzebww.cloudfront.net/1.webp" 
+        alt="阿部寛" 
+        width="400"
+        height="400"
+        loading="lazy"
+      />
+      <!-- figure/figcaptionで画像にキャプションを添える -->
+      <figure>
+        <img
+          src="https://d1d76jlpbzebww.cloudfront.net/1.webp" 
+          alt="阿部寛" 
+          width="320"
+          height="250"
+          loading="lazy"
+        />
+        <figcaption>図1：キャプションの例（画像の説明を書く場所）</figcaption>
+      </figure>
+
+      <!-- 表の基礎 -->
+      <h2 id="sec-table">表（table）の例</h2>
+      <table>
+        <!-- 表タイトル（スクリーンリーダーにも有益） -->
+        <caption>月別の学習時間</caption>
+         <!-- ヘッダー行 -->
+        <thead>
+          <tr>
+            <th scope="col">月</th>
+            <th scope="col">HTML</th>
+            <th scope="col">CSS</th>
+            <th scope="col">JavaScript</th>
+            <th scope="col">合計</th>
+          </tr>
+        </thead>
+         <!-- 本文 -->
+        <tbody>
+          <tr>
+            <th scope="row">4月</th>
+            <td>5</td>
+            <td>3</td>
+            <td>2</td>
+            <td>10</td>
+          </tr>
+          <tr>
+            <th scope="row">5月</th>
+            <td>6</td>
+            <td>4</td>
+            <td>5</td>
+            <td>15</td>
+          </tr>
+          <tr>
+            <th scope="row">6月</th>
+            <td>8</td>
+            <td>5</td>
+            <td>6</td>
+            <td>19</td>
+          </tr>
+         </tbody>
+         <tfoot>
+          <tr>
+            <!-- col/row の合成（見出しセルを2列分に） -->
+            <th scope="row" colspan="4">総合計</th>
+            <td>44</td>
+          </tr>
+         </tfoot>
+      </table>
+
+      <!-- フォーム（form）の基礎 -->
+      <h2 id="sec-form">フォームの例</h2>
+      <!-- action="" は同一ページ送信、method="get" はURLにクエリ表示（学習用） -->
+      <form action="" method="get">
+        <!-- テキスト入力 -->
+        <div>
+          <label for="fname">お名前</label>
+          <input id="fname" name="fname" type="text" placeholder="阿部 寛" required>
+        </div>
+        <!-- メール入力（ブラウザによる簡易バリデーションあり） -->
+        <div>
+          <label for="email">メール</label>
+          <input id="email" name="email" type="email" placeholder="hiroshi-abe@example.com" required>
+        </div>
+        <!-- 数値入力（最小/最大/刻み幅） -->
+         <div>
+          <label for="age">年齢</label>
+          <input id="age" name="age" type="number" min="0" max="120" step="1" placeholder="30">
+         </div>
+        <!-- 日付入力（カレンダーUI。環境によってはテキスト風表示） -->
+        <div>
+          <label for="date">学習開始日</label>
+          <input id="date" name="start_date" type="date">   
+        </div>
+        <!-- ラジオボタン（name を同じにして1つだけ選択可能） -->
+        <fieldset>
+          <legend>学習モード（いずれか1つ）</legend>
+          <label>
+            <input type="radio" name="mode" value="light" checked>
+            ライト（平日だけ）
+          </label>
+          <label>
+            <input type="radio" name="mode" value="intensive">
+            集中（毎日）
+          </label>
+        </fieldset>
+        <!-- チェックボックス（複数選択可。同じ name でも可能） -->
+        <fieldset>
+          <legend>関心のある分野（複数可）</legend>
+          <label>
+            <input type="checkbox" name="topics" value="html" checked>
+            HTML
+          </label>
+          <label>
+            <input type="checkbox" name="topics" value="css">
+            CSS
+          </label>
+          <label>
+            <input type="checkbox" name="topics" value="js">
+            JavaScript
+          </label>
+        </fieldset>
+        <!-- セレクトボックス -->
+        <div>
+          <label for="level">レベル</label>
+          <select name="lebel" id="level">
+            <option value="">選択してください</option>
+            <option value="">初級</option>
+            <option value="">中級</option>
+            <option value="">上級</option>
+          </select>
+        </div>
+        <!-- 複数行テキスト -->
+        <div>
+          <label for="message">メモ</label>
+          <textarea name="memo" id="message" rows="10" cols="30" placeholder="自由記述"></textarea>
+        </div>
+        <!-- ボタン（submit: 送信/ reset: リセット/ button: 任意JS用） -->
+        <!-- 送信後のURLに ?fname=... と表示されれば成功（本番では method="post" を使用する） -->
+        <div>
+          <button type="submit">送信（GET）</button>
+          <button type="reset">リセット</button>
+          <button type="button" onclick="alert('ボタン列です');">JS用ボタン</button>
+        </div>
+      </form>
+  </body>
+</html>
