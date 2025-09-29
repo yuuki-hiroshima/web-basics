@@ -1,33 +1,306 @@
+/* =============================
+   ベース（全体の基本設定）
+   ※ 以前は body が二重定義でしたが統合
+   ============================= */
 body { 
+  /* 日本語環境で読みやすいフォント優先 */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
                "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP",
                Meiryo, "Helvetica Neue", Arial, sans-serif;
-  margin: 500px; 
+  /* 以前は margin: 500px; → 画面が極端に空くので学習用に標準へ */
+  margin: 24px;
+  /* 元の背景色は維持 */
   background-color: rgb(243, 238, 148);
+  /* 読みやすい文字サイズ・行間・色を明示（下で上書きされないようここで確定） */
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
 }
 
+/* =============================
+   見出し
+   ※ 元は h1: 80px/darkred → 学習向けに現実的な48pxへ
+   ============================= */
 h1 { 
-  color: darkred;
-  font-size: 80px;
+  color: darkred;         /* 元の意図を採用（darkblueではなく darkred を採用） */
+  font-size: 48px;        /* 80px → 48px に調整（大見出しとして十分大きい） */
   font-weight: bold;
-  font-family: "Arial", sans-serif;
-  font-family: "M PLUS Rounded 1c", "Noto Sans JP", "Hiragino Sans",
-               Meiryo, sans-serif;
+  text-align: center;     /* 中央寄せは便利なので維持 */
+  /* フォント指定は body に任せる（重複を削除） */
 }
 
+/* =============================
+   段落
+   ※ 50px は大きすぎるので 16px に（読みやすさ優先）
+   ============================= */
+p {
+  font-size: 16px;        /* 50px → 16px に調整 */
+  line-height: 1.8;       /* 少し広めにして読みやすく */
+  color: #333;            /* 緑だと長文は疲れるので本文は標準色に */
+  margin-bottom: 12px;    /* 段落間の余白を確保 */
+}
+
+/* 補足：本文中特定箇所を大きく/色変更したい時のためのユーティリティ */
+p.lead { font-size: 18px; color: #2a2a2a; }
+
+/* =============================
+   リンク
+   ============================= */
+a {
+  color: teal;                 /* 元の色を活かす */
+  text-decoration: none; 
+}
+a:hover { text-decoration: underline; }
+
+/* =============================
+   ボタン
+   ※ 元の指定にパディング/角丸を追加
+   ============================= */
 button { 
   background: skyblue;
   color: white;
-  font-size: 40px; 
+  font-size: 16px;        /* 40px → 16px（通常UI向け） */
+  padding: 6px 12px;      /* もともと希望していた見た目を統合 */
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
 }
+button:hover { filter: brightness(1.05); }
 
-p {
-  font-size: 50px;
-  line-height: 2;
-  color: green;
-}
-
+/* =============================
+   テキスト幅ユーティリティ
+   ============================= */
 .main-text {
-  max-width: 70ch;
-  letter-spacing: 10px;
+  max-width: 70ch;        /* 1行の最大文字数を制御して読みやすく */
+  letter-spacing: 0.02em; /* 10px → 過剰だったので適度に */
+  margin-inline: auto;    /* 中央寄せ */
+}
+
+/* =============================
+   ◆ 学習用：ボックスモデルとFlexbox
+   ============================= */
+
+/* セクション全体の余白 */
+.lab {
+  margin-top: 32px;
+}
+
+/* 見出し */
+.lab h2 {
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+
+/* 横並びの行（ボックス3つを並べる） */
+.box-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  align-items: center;              /* ボックスそのものに対し、縦方向の揃え */
+  justify-content: center;          /* ボックスそのものに対し、横方向の揃え */
+}
+
+/* 共通の箱（ボックスモデルの差を見やすく） */
+.box {
+  box-sizing: border-box;
+  width: 120px;
+  height: 80px;
+  background: #e8f4ff;
+  border: 4px solid #60a5fa;
+  padding: 12px;
+  margin: 6px; 
+  display: flex;
+  align-items: center;              /* ボックス内の文字の位置に対し、縦方向の揃え */
+  justify-content: center;          /* ボックス内の文字の位置に対し、横方向の揃え */
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+/* バリエーション（padding//border/marginの違いを確認） */
+.demo-a { padding: 24px; }          /* 内側余白を増やす → 中身の位置が変わる */
+.demo-b { border-width: 10px; }     /* 枠線を太くする → 外形サイズに影響 */
+.demo-c { margin: 18px; }           /* 外側余白を増やす → 隣とのすき間が広がる */
+
+/* Flexboxのデモ（カードを横並び） */
+.flex-demo {
+  flex-wrap: wrap;                  /* 幅が足りなければ折り返す */
+  display: flex;                    /* 横並び */
+  gap: 18px;                        /* 要素間のすき間 */
+  margin: 20px 0;
+  justify-content: center;          /* 横方向の揃え */
+  align-items: center;              /* 縦方向の揃え */
+}
+
+/* 折り返しONのバージョン（狭い画面で下に回り込む） */
+.flex-demo .wrap {
+  flex-wrap: wrap;                  /* 幅が足りなければ折り返す */
+  row-gap: 10px;                    /* 折返し時の行のすき間 */
+}
+
+/* Flexの子要素（カード） */
+.flex-demo .card {
+  flex: 1 1 120px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+}
+
+/* タグっぽい見た目の小要素 */
+.pill {
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 300px;
+}
+
+/* ===== Grid 基礎 ===== */
+
+/* セクションの見た目（余白など） */
+.section {
+  margin: 32px 0;
+}
+.section > h2 {
+  margin-bottom: 8px;
+  font-size: 20px;
+}
+.note {
+  color: #666;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+/* グリッドの親：列定義がキモ
+   - auto-fit: 置けるだけ列を自動で増やす
+   - minmax(200px, 1fr): 各カードは最小200px、余白があれば均等に伸びる
+   - gap: カード間のすき間 */
+.grid-demo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+/* カードの見た目（GridでもFlexでも使い回せる汎用スタイル） */
+.grid-demo .card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* ホバーでカードが浮き上がるまでの時間 */
+.grid-demo .card {
+  transition: transform .12s ease, box-shadow .12s ease;
+  will-change: transform;
+}
+
+/* ホバーでカードが浮き上がる際の見え方 */
+.grid-demo .card:hover {
+  transition: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.12);
+}
+
+/* 一部のカードだけを大きくする */
+.grid-demo .card:nth-child(1) {
+  grid-column: span 2;
+}
+
+/* 画面がかなり狭い場合は列の最小幅を少し下げる例（任意）*/
+@media (max-width: 420px) {
+  .grid-demo {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
+/* === レイアウトの土台: コンテナ ===
+   画面幅が広くても読みやすい行幅に制限し、左右中央寄せにする */
+.container {
+  max-width: 960px;
+  margin-inline: auto;
+  padding: 0 16px;
+}
+/* === レスポンシブ: 画面が狭くなったら調整 === */
+@media (max-width: 768px) {
+  html { font-size: 15px; }        /* 全体の文字を少しだけ大きく/間延び防止 */
+  .grid-demo {                     /* カードのグリッド例（既に .grid-demo を使っていたら有効） */
+    display: grid;
+    grid-template-columns: 1fr 1fr;     /* 2列 */
+    gap: 12px;
+  }
+}
+@media (max-width: 480px) {
+  .grid-demo {
+    grid-template-columns: 1fr;         /* 1列に折り返す */
+  }
+}
+
+/* === テーマ変数（色・余白） ===
+   値を一箇所で管理して、後から全体調整しやすくする */
+:root {
+  --accent: #13abf2;        /* 強調色（リンクやボタンの色など） */
+  --text:   #222;           /* 文字色の標準 */
+  --muted:  #666;           /* 補助テキスト色 */
+  --radius: 12px;           /* 角丸の標準 */
+  --space:  16px;           /* 余白の標準 */
+}
+/* 既存の要素で使ってみる例（CSSは下部が優先されるため、あえて元のコードの修正や削除はしていない） */
+h1 {
+  color: var(--accent);
+}
+button {
+  border-radius: var(--radius);
+}
+
+/* === ホバー/フォーカスの視覚的フィードバック === */
+button:hover {
+  filter: brightness(1.05);
+  transition: filter .15s ease;
+}
+/* キーボード操作ユーザー向けのフォーカスリング（視認性アップ）
+   :focus-visible は「キーボードのときだけ」基本出るので鬱陶しくない */
+a:focus-visible, button:focus-visible {
+  outline: 3px solid #60a5fa;
+  outline-offset: 3px;
+  border-radius: var(--radius);
+}
+/* === :disabled の見た目（押せないボタンを明示） === */
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* === 疑似要素で“リボン”っぽい装飾例（カードの左上に小さな帯） ===
+   HTMLを書き換えずに飾りを足せるのが ::before / ::after の利点 */
+.card.ribbon {
+  position: relative;
+  overflow: hidden;
+}
+.card.ribbon::before {
+  content: "NEW";
+  position: absolute;
+  top: 10px;
+  left: -32px;
+  text-align: center;
+  transform: rotate(-20deg);
+  background: var(--accent);
+  color: white;
+  font-size: 20px;
+  letter-spacing: 0.8em;
+  padding: 4px 90px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+}
+/* === 動きを苦手とするユーザーに配慮 === */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }

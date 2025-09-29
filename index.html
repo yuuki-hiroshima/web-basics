@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Web Baisics</title>
+    <title>Web Basics</title>
     <link rel="stylesheet" href="./style.css" />
     <script defer src="script.js"></script>
   </head>
   <body>
+    <div class="container">
     <h1 id="title">配線テスト</h1>
     <p class="main-text">これは段落です。</p>
     <button id="btn">クリックして色変更</button>
@@ -170,11 +171,11 @@
         <!-- セレクトボックス -->
         <div>
           <label for="level">レベル</label>
-          <select name="lebel" id="level">
+          <select name="level" id="level">
             <option value="">選択してください</option>
-            <option value="">初級</option>
-            <option value="">中級</option>
-            <option value="">上級</option>
+            <option value="beginner">初級</option>
+            <option value="intermediate">中級</option>
+            <option value="advanced">上級</option>
           </select>
         </div>
         <!-- 複数行テキスト -->
@@ -190,5 +191,64 @@
           <button type="button" onclick="alert('ボタン列です');">JS用ボタン</button>
         </div>
       </form>
+
+      <!-- レイアウト実験：ボックスモデルとFlexbox -->
+      <section class="lab">
+        <h2>レイアウト実験</h2>
+        <!-- ボックスモデルの比較 -->
+        <div class="box-row">
+          <div class="box demo-a">A</div>
+          <div class="box demo-b">B</div>
+          <div class="box demo-c">C</div>
+        </div>
+        <!-- Flexboxの方向と並び -->
+        <div class="flex-demo">
+          <div class="card">1</div>
+          <div class="card">2</div>
+          <div class="card">3</div>
+        </div>
+        <!-- 折り返し・間隔・整列 -->
+        <div class="flex-demo wrap">
+          <div class="pill">あ</div>
+          <div class="pill">い</div>
+          <div class="pill">う</div>
+          <div class="pill">え</div>
+          <div class="pill">お</div>
+        </div>
+      </selection>
+
+      <!-- Grid 基礎 デモ -->
+      <section class="section">
+        <h2>CSS Grid の基本</h2>
+        <p class="note">画面幅に応じて列数が自動で増減します（auto-fit + minmax）。</p>
+        <!-- グリッドのコンテナ -->
+        <div class="grid-demo">
+          <div class="card">A</div>
+          <div class="card">B</div>
+          <div class="card">C</div>
+          <div class="card">D</div>
+          <div class="card">E</div>
+          <div class="card">F</div>
+          <div class="card">G</div>
+          <div class="card">H</div>
+        </div>
+      </section>
+      <!-- 既存のカードの一つに .ribbon を足すだけで帯が出る -->
+      <h2>リボンの装飾</h2>
+      <div class="grid-demo">
+        <div class="card ribbon">
+          <h3>カードA</h3>
+          <p>疑似要素リボンの例。</p>
+        </div>
+        <div class="card">
+          <h3>カードB</h3>
+          <p>通常のカード</p>
+        </div>
+        <div class="card">
+          <h3>カードC</h3>
+          <p>通常のカード</p>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
