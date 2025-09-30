@@ -1,0 +1,447 @@
+/* =============================
+   フォーム基礎スタイル（整理ver）
+   - 入力欄の高さ・余白・角丸・フォーカス
+   - 2カラム→モバイルで1カラム
+   - 必須マーク、補助テキスト、エラー表示
+   ============================= */
+
+/* =============== 基本レイアウト（フォーム用だけに最小構成） =============== */
+/* ページ中央の行幅制御用ラッパ */
+.container {
+  max-width: 720px;             /* フォーム本文の理想幅 */
+  margin: 32px auto;            /* 左右中央寄せ */
+  padding: 0 16px;              /* 画面端との余白 */
+}
+
+/* フォーム全体のカード見た目（既存の .card があれば省略可） */
+.form-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+/* ラベル＋入力を並べるグリッド（PC:2列 / スマホ:1列） */
+.form-card > h2 {
+  font-size: 24px;
+  margin: 0 0 16px;
+}
+
+/* =============== 入力レイアウト =============== */
+/* PC: 2カラム / モバイル: 1カラム */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+@media (max-width: 640px) {
+  .form-grid {grid-template-columns: 1fr; }
+}
+/* 各フィールドの箱（行） */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+/* ラベルの見た目 */
+.field label {
+  font-weight: 700;
+  line-height: 1.3;
+  font-size: 0.95rem;
+}
+/* 必須ラベルに「＊」をつける（.requiredをラベルにつける） */
+.field label.required::after {
+  content: " *";
+  color: #dc2626;
+  margin-left: 2px;
+}
+/* テキスト入力/セレクト/テキストエリアの共通見た目 */
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="number"],
+.field input[type="date"],
+.field select,
+.field textarea {
+  font: inherit;
+  color: #111827;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 12px;
+  line-height: 1.4;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+/* フォーカス時の見やすいリング */
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96,165,250,.35);
+}
+/* 無効・読み取り専用などの状態 */
+.field input[disabled],
+.field select[disabled],
+.field textarea[disabled] {
+  background: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+/* ちょっとした補助説明テキスト */
+.field .help {
+  font-size: 0.85rem;
+  color: #fa0606;
+  margin-top: auto;
+}
+
+/* =============== ボタン行 =============== */
+/* ボタン行のレイアウト（右寄せ→スマホは縦積み） */
+.actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+@media (max-width: 640px) {
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .actions .btn { width: 100%; }
+}
+/* ボタンの色（学習用の簡易バリエーション） */
+.btn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  cursor: pointer;
+}
+.btn:hover { filter: brightness(1.03); }
+.btn.primary { background: #1109f6; border-color: #1d4ed8; color: #fff; }
+.btn.success { background: #10b981; border-color: #0ea37a; color: #fff; }
+
+/* ↓削除してもいい？↓ */
+/* 視覚的に隠すがスクリーンリーダーには伝える（必要時） */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+/* 簡易バリデーションの見た目（ブラウザの :invalid を利用） */
+.field input:invalid,
+.field select:invalid,
+.field textarea:invalid {
+  border-color: #f87171;
+}
+.field .error {
+  font-size: 0.85rem;
+  color: #dc2626;
+}
+/* ↑削除してもいい？↑ */
+
+
+/* =============================
+   テーブルの見た目改善
+   ============================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 16px;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #f63302;
+  border-radius: 8px;
+  overflow: hidden;
+}
+/* ヘッダー部分 */
+table thead {
+  background-color: #2563eb;
+  color: #070606;
+}
+/* ヘッダーとセルの共通スタイル */
+table th,
+table td {
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-bottom: 1px solid #fb0404;
+  text-align: center;
+}
+/* 偶数行だけ背景色を変える（ストライプ） */
+table tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+/* 行にホバーしたとき背景を薄いグレーに */
+table tbody tr:hover {
+  background-color: #f1f5f9;
+}
+/* フッター（合計行）は少し強調 */
+table tfoot {
+  background-color: #f3f4f6;
+  font-weight: bold;
+}
+/* 数値は右寄せ */
+table td {
+  text-align: center;
+}
+table th[scope="row"] {
+  text-align: center;
+}
+
+/* =============================
+   列ごとの色分け（対象: .col-colored）
+   - 見出し thead / 本文 tbody / フッター tfoot すべて同じ色で列を統一
+   - 色は薄め（背景とコントラストを保つ）
+   - 必要に応じて --colN を調整
+   ============================= */
+/* 列カラー変数（お好みで調整） */
+:root {
+  --col1: #d5e876;
+  --col2: #2673d8;
+  --col3: #19e044;
+  --col4: #f8227f;
+  --col5: #0d0d9c;
+}
+
+/* 1列目 */
+.col-colored thead th:nth-child(1),
+.col-colored tbody th:nth-child(1),       /* tbodyの1列目だけは、<th scope="row">となっているため、記述を「th」に変更して対応（4月/5月/6月の部分） */
+.col-colored tfoot th:nth-child(1),
+.col-colored tfoot td:nth-child(1) { background-color: var(--col1); }
+
+/* 2列目 */
+.col-colored thead th:nth-child(2),
+.col-colored tbody td:nth-child(2),
+.col-colored tfoot th:nth-child(2),
+.col-colored tfoot td:nth-child(2) { background-color: var(--col2); }
+
+/* 3列目 */
+.col-colored thead th:nth-child(3),
+.col-colored tbody td:nth-child(3),
+.col-colored tfoot th:nth-child(3),
+.col-colored tfoot td:nth-child(3) { background-color: var(--col3); }
+
+/* 4列目 */
+.col-colored thead th:nth-child(4),
+.col-colored tbody td:nth-child(4),
+.col-colored tfoot th:nth-child(4),
+.col-colored tfoot td:nth-child(4) { background-color: var(--col4); }
+
+/* 5列目 */
+.col-colored thead th:nth-child(5),
+.col-colored tbody td:nth-child(5),
+.col-colored tfoot th:nth-child(5),
+.col-colored tfoot td:nth-child(5) { background-color: var(--col5); }
+
+/* 列カラー（thead / tbody / tfoot 全部まとめる場合は以下の書き方を5セットでOK） */
+/* .col-colored thead tr > :nth-child(1), */
+/* .col-colored tbody tr > :nth-child(1), */
+/* .col-colored tfoot tr > :nth-child(1) { background: var(--col1); } */
+/* ポイント
+	•	tr > :nth-child(n) で td と th の両方にマッチ
+	•	スペースを入れない（th :nth-child ではなく th:nth-child）
+	•	既存のヘッダー背景などに負ける場合は「後ろに書く」か特異性を上げる
+  •	他にもHTML側に<colgroup>タグを使うことで、CSSコードを5行にまとめられる。 */
+
+/* ===== テーブル：列ごとの“強調”スタイル ===== */
+/* 1) 列ごとに背景色と文字色を変数で管理（コントラスト確保）背景カラー＋文字色 */ 
+:root {
+  --col1-bg:#f7f9ff; --col1-fg:#111;
+  --col2-bg:#2563eb; --col2-fg:#111;
+  --col3-bg:#16a34a; --col3-fg:#111;
+  --col4-bg:#dc2626; --col4-fg:#111;
+  --col5-bg:#7c3aed; --col5-fg:#111;
+}
+
+/* 2) テーブルのベース（別で記述しているため、コメントアウト） */
+/* table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  border: 1px solid #d1d5db;
+  padding: 8px 10px;
+  text-alig 
+} */
+
+/* 3) 行見出し（tbody の th）を“固定強調”：太字＋左寄せ＋うっすら背景 */
+tbody th[scope="row"] {
+  text-align: center;
+  font-weight: 700;
+  background: #f3f4f6;
+}
+
+/* 4) 列ごとの背景＋文字色（thead / tbody / tfoot すべてに適用）
+      ※ スペースを入れないこと（th:nth-child(2) ←OK / th :nth-child(2) ←NG） */
+.col-colored thead th:nth-child(1),
+.col-colored tbody th:nth-child(1),      /* tbodyの1列目だけは、<th scope="row">となっているため、記述を「th」に変更して対応（4月/5月/6月の部分） */
+.col-colored tfoot th:nth-child(1),
+.col-colored tfoot td:nth-child(1) { 
+  background-color: var(--col1-bg); color: var(--col1-fg);
+}
+.col-colored thead th:nth-child(2),
+.col-colored tbody td:nth-child(2),
+.col-colored tfoot th:nth-child(2),
+.col-colored tfoot td:nth-child(2) { 
+  background-color: var(--col2-bg); color: var(--col2-fg);
+}
+.col-colored thead th:nth-child(3),
+.col-colored tbody td:nth-child(3),
+.col-colored tfoot th:nth-child(3),
+.col-colored tfoot td:nth-child(3) { 
+  background-color: var(--col3-bg); color: var(--col3-fg);
+}
+.col-colored thead th:nth-child(4),
+.col-colored tbody td:nth-child(4),
+.col-colored tfoot th:nth-child(4),
+.col-colored tfoot td:nth-child(4) { 
+  background-color: var(--col4-bg); color: var(--col4-fg);
+}
+.col-colored thead th:nth-child(5),
+.col-colored tbody td:nth-child(5),
+.col-colored tfoot th:nth-child(5),
+.col-colored tfoot td:nth-child(5) { 
+  background-color: var(--col5-bg); color: var(--col5-fg);
+}
+
+/* 5) ヘッダー行は「列色＋太字」でインパクトUP */
+.col-colored thead th {
+  font-weight: 800;
+}
+
+/* 6) 列色 × 行ホバーの競合を調整
+      → ホバー時は列色の上にうっすら乗せる（視認性を壊さない） */
+.col-colored tbody tr:hover td {
+  box-shadow: inset 0 0 0 9999px rgba(0,0,0,.06);
+}
+
+/* 7) 列の“縦の境目”を少しだけ強調（見やすく） */
+.col-colored td + td,
+.col-colored th + th {
+  box-shadow: inset 2px 0 0 rgba(255,255,255,.25);
+}
+
+/* =============================
+   テーブル便利セット
+   - .table         基本スタイル
+   - .table--striped 行ごとに縞模様
+   - .table--compact 密度を詰める
+   - .table--sticky  ヘッダー固定
+   - .table--num     数値列の右寄せ＆等幅
+   - .table--responsive モバイルで“カード化”
+   ============================= */
+
+/* ベース */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 20px;
+  overflow: hidden;
+}
+.table caption {
+  caption-side: top;
+  text-align: left;
+  font-weight: 700;
+  padding: 8px 10px;
+  color: #374151;
+}
+.table thead th,
+.table tfoot th {
+  background: #f3f4f6;
+  font-weight: 800;
+}
+.table th,
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: center;
+  word-break: break-word;
+}
+/* 縞模様（tbodyのみ） */
+.table--striped tbody tr:nth-child(odd) td,
+.table--striped tbody tr:nth-child(odd) th[scope="row"] {
+  background: #e2e0e0;
+}
+/* ホバー行強調（縞と共存OK） */
+.table tbody tr:hover td,
+.table tbody tr:hover th[scope="row"] {
+  background: #f0f7ff;
+}
+/* 余白を詰めた密度バージョン */
+.table--compact th,
+.table--compact td {
+  padding: 6px 8px;
+  font-size: 0.95rem;
+}
+
+/* .table--compact tr > * {
+  padding: 6px 8px;               ↑こっちでもOKだが可読性を重視するなら省略しないほうが良い
+  font-size: 0.95rem;
+} */
+
+/* ヘッダー固定（縦に長い表で便利） */
+.table--sticky thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  box-shadow: 0 1px 0 #e5e7eb;
+}
+/* 数値の見やすさ（右寄せ＋等幅） */
+.table--num td,
+.table--num th[scope="row"] {
+  font-variant-numeric: tabular-nums;   /* 桁が揃う */
+}
+.table--num td:not(:first-child) {
+  text-align: right;
+}
+
+/* 列ごと色（すでに .col-colored を使っている場合はそのまま併用可） */
+
+/* モバイル対応：カード化
+   - 画面が狭いときだけ、各行を“カード”っぽく縦に並べる
+   - セルに data-label を付けてヘッダー見出しを表示する
+*/
+@media (max-width: 560px) {
+  .table--responsive thead {
+    display: none;
+  }
+  .table--responsive tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 12px;
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .table--responsive td,
+  .table--responsive th[scope="row"] {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 6px;
+    text-align: left;
+    border: none;
+    padding: 4px 0;
+    background: transparent !important;
+  }
+  .table--responsive td::before,
+  .table--responsive th[scope="row"]::before {
+    content: attr(data-label);
+    color: #6b7280;
+    font-weight: 600;
+    min-width: 6em;
+  }
+}

@@ -4,38 +4,42 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Web Basics</title>
-    <link rel="stylesheet" href="./style.css" />
+    <!-- 学習用スタイル（整理版） -->
+    <link rel="stylesheet" href="./style1.css" />
+    <!-- 学習用の簡単なJS（色変更ボタンなど） -->
     <script defer src="script.js"></script>
   </head>
   <body>
+    <!-- 行幅制御＆中央寄せの親ラッパ（style1.css の .container と一致） -->
     <div class="container">
-    <h1 id="title">配線テスト</h1>
-    <p class="main-text">これは段落です。</p>
-    <button id="btn">クリックして色変更</button>
+
+      <!-- ページタイトル＆導入 -->
+      <h1 id="title">配線テスト</h1>
+      <p class="main-text">これは段落です。</p>
+      <button id="btn" class="btn">クリックして色変更</button>
 
       <!-- リンクの基礎 -->
       <h2>リンクの例</h2>
-      <p>こちらは <a href="https://www.google.com" target="_blank">Google</a> へのリンクです。</p>
+      <p>こちらは <a href="https://www.google.com" target="_blank" rel="noopener noreferrer">Google</a> へのリンクです。</p>
 
       <!-- リストの基礎 -->
       <h2>リストの例</h2>
-      <!-- 順番なしリスト -->
-       <p>買い物リスト：</p>
+      <p>買い物リスト：</p>
       <ul>
         <li>りんご</li>
         <li>ばなな</li>
         <li>オレンジ</li>
       </ul>
-      <!-- 順番ありリスト -->
-       <p>乗り物リスト：</p>
+
+      <p>乗り物リスト：</p>
       <ol>
         <li>くるま</li>
         <li>バイク</li>
         <li>飛行機</li>
       </ol>
-      <!-- ネスト（入れ子）したリスト -->
-       <p>学習項目（入れ子の例）：</p>
-       <ul>
+
+      <p>学習項目（入れ子の例）：</p>
+      <ul>
         <li>HTML
           <ul>
             <li>リンク</li>
@@ -43,24 +47,25 @@
             <li>画像</li>
           </ul>
         </li>
-        <li>css</li>
+        <li>CSS</li>
         <li>JavaScript</li>
-       </ul>
+      </ul>
 
       <!-- 画像の基礎 -->
       <h2>画像の例</h2>
       <img
         src="https://d1d76jlpbzebww.cloudfront.net/1.webp" 
-        alt="阿部寛" 
+        alt="人物の写真（サンプル）" 
         width="400"
         height="400"
         loading="lazy"
       />
+
       <!-- figure/figcaptionで画像にキャプションを添える -->
       <figure>
         <img
           src="https://d1d76jlpbzebww.cloudfront.net/1.webp" 
-          alt="阿部寛" 
+          alt="人物の写真（サンプル）" 
           width="320"
           height="250"
           loading="lazy"
@@ -70,10 +75,8 @@
 
       <!-- 表の基礎 -->
       <h2 id="sec-table">表（table）の例</h2>
-      <table>
-        <!-- 表タイトル（スクリーンリーダーにも有益） -->
+      <table class="col-colored table table--striped table--num table--responsive">
         <caption>月別の学習時間</caption>
-         <!-- ヘッダー行 -->
         <thead>
           <tr>
             <th scope="col">月</th>
@@ -83,95 +86,88 @@
             <th scope="col">合計</th>
           </tr>
         </thead>
-         <!-- 本文 -->
         <tbody>
           <tr>
-            <th scope="row">4月</th>
-            <td>5</td>
-            <td>3</td>
-            <td>2</td>
-            <td>10</td>
+            <th scope="row" data-label="月">4月</th>
+            <td data-label="HTML">5</td>
+            <td data-label="CSS">3</td>
+            <td data-label="JavaScript">2</td>
+            <td data-label="合計">10</td>
           </tr>
           <tr>
-            <th scope="row">5月</th>
-            <td>6</td>
-            <td>4</td>
-            <td>5</td>
-            <td>15</td>
+            <th scope="row" data-label="月">5月</th>
+            <td data-label="HTML">6</td>
+            <td data-label="CSS">4</td>
+            <td data-label="JavaScript">5</td>
+            <td data-label="合計">15</td>
           </tr>
           <tr>
-            <th scope="row">6月</th>
-            <td>8</td>
-            <td>5</td>
-            <td>6</td>
-            <td>19</td>
+            <th scope="row" data-label="月">6月</th>
+            <td data-label="HTML">8</td>
+            <td data-label="CSS">5</td>
+            <td data-label="JavaScript">6</td>
+            <td data-label="合計">19</td>
           </tr>
-         </tbody>
-         <tfoot>
+        </tbody>
+        <tfoot>
           <tr>
-            <!-- col/row の合成（見出しセルを2列分に） -->
             <th scope="row" colspan="4">総合計</th>
             <td>44</td>
           </tr>
-         </tfoot>
+        </tfoot>
       </table>
 
-      <!-- フォーム（form）の基礎 -->
+      <!-- =========================
+           フォーム（form）の基礎
+           ========================= -->
+      <!-- 1枚のカードとして見せる（枠線は .form-card のみ） -->
       <section class="form-card">
         <h2 id="sec-form">フォームの例</h2>
-        <!-- action="" は同一ページ送信、method="get" はURLにクエリ表示（学習用） -->
-        <form action="" method="get" class="form-grid">
+
+        <!-- グリッドで2カラム（モバイル1カラム） -->
+        <form action="" method="get" class="form-grid" novalidate>
           <!-- テキスト入力 -->
-          <div class="form-field">
-            <label for="fname">お名前</label>
-            <input id="fname" name="fname" type="text" placeholder="阿部 寛" required>
-            <p class="form-help">※本名またはハンドルネームでもOKです。</p>
+          <div class="field">
+            <label for="fname" class="required">お名前</label>
+            <input id="fname" name="fname" type="text" placeholder="阿部 寛" required />
+            <p class="help">※本名またはハンドルネームでもOKです。</p>
           </div>
-          <!-- メール入力（ブラウザによる簡易バリデーションあり） -->
-          <div class="form-field">
-            <label for="email">メール</label>
-            <input id="email" name="email" type="email" placeholder="hiroshi-abe@example.com" required>
+
+          <!-- メール（ブラウザの簡易バリデーション） -->
+          <div class="field">
+            <label for="email" class="required">メール</label>
+            <input id="email" name="email" type="email" placeholder="hiroshi-abe@example.com" required />
           </div>
-          <!-- 数値入力（最小/最大/刻み幅） -->
-          <div class="form-field">
+
+          <!-- 数値 -->
+          <div class="field">
             <label for="age">年齢</label>
-            <input id="age" name="age" type="number" min="0" max="120" step="1" placeholder="30">
+            <input id="age" name="age" type="number" min="0" max="120" step="1" placeholder="30" />
           </div>
-          <!-- 日付入力（カレンダーUI。環境によってはテキスト風表示） -->
-          <div class="form-field">
+
+          <!-- 日付 -->
+          <div class="field">
             <label for="date">学習開始日</label>
-            <input id="date" name="start_date" type="date">   
+            <input id="date" name="start_date" type="date" />
           </div>
-          <!-- ラジオボタン（name を同じにして1つだけ選択可能） -->
-          <fieldset class="form-field">
+
+          <!-- ラジオボタン（1列にまとめるため、2カラムをまたぐ） -->
+          <fieldset class="field" style="grid-column: 1 / -1;">
             <legend>学習モード（いずれか1つ）</legend>
-            <label>
-              <input type="radio" name="mode" value="light" checked>
-              ライト（平日だけ）
-            </label>
-            <label>
-              <input type="radio" name="mode" value="intensive">
-              集中（毎日）
-            </label>
+            <label><input type="radio" name="mode" value="light" checked /> ライト（平日だけ）</label>
+            <label><input type="radio" name="mode" value="intensive" /> 集中（毎日）</label>
           </fieldset>
-          <!-- チェックボックス（複数選択可。同じ name でも可能） -->
-          <fieldset class="form-field">
+
+          <!-- チェックボックス（複数選択可・同名OK） -->
+          <fieldset class="field" style="grid-column: 1 / -1;">
             <legend>関心のある分野（複数可）</legend>
-            <label>
-              <input type="checkbox" name="topics" value="html" checked>
-              HTML
-            </label>
-            <label>
-              <input type="checkbox" name="topics" value="css">
-              CSS
-            </label>
-            <label>
-              <input type="checkbox" name="topics" value="js">
-              JavaScript
-            </label>
+            <label><input type="checkbox" name="topics" value="html" checked /> HTML</label>
+            <label><input type="checkbox" name="topics" value="css" /> CSS</label>
+            <label><input type="checkbox" name="topics" value="js" /> JavaScript</label>
           </fieldset>
-          <!-- セレクトボックス -->
-          <div class="form-field">
+
+          <!-- セレクト -->
+          <div class="field">
             <label for="level">レベル</label>
             <select name="level" id="level">
               <option value="">選択してください</option>
@@ -180,36 +176,41 @@
               <option value="advanced">上級</option>
             </select>
           </div>
-          <!-- 複数行テキスト -->
-          <div class="form-field">
+
+          <!-- 複数行テキスト（2カラムをまたぐ） -->
+          <div class="field" style="grid-column: 1 / -1;">
             <label for="message">メモ</label>
             <textarea name="memo" id="message" rows="10" cols="30" placeholder="自由記述"></textarea>
           </div>
-          <!-- ボタン（submit: 送信/ reset: リセット/ button: 任意JS用） -->
-          <!-- 送信後のURLに ?fname=... と表示されれば成功（本番では method="post" を使用する） -->
-          <div class="form-actions">
-            <button type="submit">送信（GET）</button>
-            <button type="reset">リセット</button>
-            <button type="button" onclick="alert('ボタン列です');">JS用ボタン</button>
+
+          <!-- ボタン行（.actions は style1.css 側で横並び＆右寄せ） -->
+          <div class="actions">
+            <button type="submit" class="btn primary">送信（GET）</button>
+            <button type="reset"  class="btn">リセット</button>
+            <button type="button" class="btn success" onclick="alert('ボタン列です');">JS用ボタン</button>
           </div>
         </form>
       </section>
+
       <!-- レイアウト実験：ボックスモデルとFlexbox -->
       <section class="lab">
         <h2>レイアウト実験</h2>
+
         <!-- ボックスモデルの比較 -->
         <div class="box-row">
           <div class="box demo-a">A</div>
           <div class="box demo-b">B</div>
           <div class="box demo-c">C</div>
         </div>
+
         <!-- Flexboxの方向と並び -->
         <div class="flex-demo">
           <div class="card">1</div>
           <div class="card">2</div>
           <div class="card">3</div>
         </div>
-        <!-- 折り返し・間隔・整列 -->
+
+        <!-- 折り返し・間隔・整列（狭い画面で下に回り込む） -->
         <div class="flex-demo wrap">
           <div class="pill">あ</div>
           <div class="pill">い</div>
@@ -217,13 +218,13 @@
           <div class="pill">え</div>
           <div class="pill">お</div>
         </div>
-      </selection>
+      </section>
 
       <!-- Grid 基礎 デモ -->
       <section class="section">
         <h2>CSS Grid の基本</h2>
         <p class="note">画面幅に応じて列数が自動で増減します（auto-fit + minmax）。</p>
-        <!-- グリッドのコンテナ -->
+
         <div class="grid-demo">
           <div class="card">A</div>
           <div class="card">B</div>
@@ -235,7 +236,8 @@
           <div class="card">H</div>
         </div>
       </section>
-      <!-- 既存のカードの一つに .ribbon を足すだけで帯が出る -->
+
+      <!-- リボンの装飾（疑似要素） -->
       <h2>リボンの装飾</h2>
       <div class="grid-demo">
         <div class="card ribbon">
@@ -251,6 +253,7 @@
           <p>通常のカード</p>
         </div>
       </div>
-    </div>
+
+    </div><!-- /.container -->
   </body>
 </html>
