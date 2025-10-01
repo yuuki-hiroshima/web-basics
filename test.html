@@ -1,0 +1,115 @@
+<!-- HTML+CSS+JavaScript -->
+
+<!-- <!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>背景切り替えデモ</title>
+
+  <style>
+    .box {
+      width: 500px;
+      height: 500px;
+      background: lightgray;
+      transition: background 2.3s;
+    }
+    /* 背景色がアクティブなとき */
+    .box.active {
+      background: lightgreen;
+    }
+  </style>
+</head>
+<body>
+  <button id="toggle-btn">背景を切り替え</button>
+  <div id="box" class="box">ボックス</div>
+
+  <script>
+    // 要素を取得
+    const box = document.querySelector("#box");
+    const btn = document.querySelector("#toggle-btn");
+
+    // クリックでクラスを付け外し
+    btn.addEventListener("click", () => {
+      box.classList.toggle("active");
+    });
+  </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JS基礎：テキスト & CSS変更</title>
+  <style>
+    /* ▼表示エリアのベース見た目 */
+    #color-box {
+      width: 240px;
+      height: 120px;
+      background: lightblue;
+      color: black;
+      text-align: center;
+      line-height: 120px;
+      border-radius: 10px;
+      margin: 24px auto;
+      transition: background .2s ease, color .2s ease, transform .12s ease;
+    }
+
+    /* ▼「変更後」の見た目（ここだけをJSで付け外し） */
+    #color-box.is-active {
+      background: lightcoral;
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    /* 体験用のボタン見た目（任意） */
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      cursor: pointer;
+    }
+    button:hover { filter: brightness(1.03); }
+  </style>
+</head>
+<body>
+  <!-- ▼対象のボックス -->
+   <div id="color-box">色が変わります</div>
+  <!-- ▼操作ボタン -->
+   <div class="actions">
+    <button id="btn-toggle" aria-pressed="false">色を切り替える</button>
+    <button id="btn-reset">元に戻す</button>
+   </div>
+
+   <script>
+    // 1) 要素をキャッシュ（毎回DOMを検索しない）
+    const box = document.getElementById('color-box');
+    const btnToggle = document.getElementById('btn-toggle');
+    const btnReset = document.getElementById('btn-reset');
+
+    // 2) トグル動作：クラスを付け外しして見た目を切替
+    btnToggle.addEventListener('click', () => {
+      const active = box.classList.toggle('is-active'); // 付いたら true, 外れたら false
+      // テキストも合わせて切替（任意）
+      box.textContent = active ? '色が変わりました' : '色が変わります';
+      // アクセシビリティ：トグル状態をスクリーンリーダーに伝える
+      btnToggle.setAttribute('aria-pressed', String(active));
+    });
+
+    // 3) リセット動作：確実に元の状態へ
+    btnReset.addEventListener('click', () => {
+      box.classList.remove('is-active')
+      box.textContent = '色が変わります';
+      btnToggle.setAttribute('aria-pressed', 'false');
+    });
+   </script>
+</body>
+</html>

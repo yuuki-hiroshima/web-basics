@@ -1,0 +1,144 @@
+
+
+
+<!-- このファイル内のコードは実行できない（不要なコードをコメントアウトしても実行できない） -->
+<!-- 必要なコードを「test.html」に移動させて実行 -->
+<!-- こちらはノートの役割として利用 -->
+
+
+<!-- 「文字を変える」と書かれたボタンを押すと、「こんにちは」から「こんばんは」に表示が変わる。 -->
+
+<template>
+  <!DOCTYPE html>
+  <html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>JS基礎：文字変更</title>
+  </head>
+  <body>
+    <p id="message">こんにちは！</p>
+    <button id="btn1">文字を変える</button>
+
+    <script>
+      document.querySelector("#btn1").addEventListener("click", function() {  // ボタンをクリックしたら実行する処理
+        document.querySelector("#message").textContent = "こんばんは！";        // pタグの中身を書き換え
+      });
+    </script>
+  </body>
+  </html> 
+</template>
+
+<!-- 「色を変える」と書かれたボタンを押すと、「色が変わります」のテキストが「ライトブルー（背景）」→「ホワイト（文字）」「ライトコーラル（背景）」に変わる。 -->
+
+<template>
+  <!DOCTYPE html>
+  <html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>JS基礎：CSS変更</title>
+    <style>
+      #color-box {
+        width: 200px;
+        height: 100px;
+        background: lightblue;
+        text-align: center;
+        line-height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="color-box">色が変わります</div>
+    <button id="btn2">色を変える</button>
+
+    <script>
+      document.querySelector("#btn2").addEventListener("click", function() {
+        document.querySelector("#color-box").style.background = "lightcoral";
+        document.querySelector("#color-box").style.color = "white";
+        document.querySelector("#color-box").textContent = "色が変わりました";
+      });
+    </script>
+  </body>
+  </html>
+</template>
+
+<!-- 上記から以下のポイントを変更
+1.	querySelector を毎回呼ばず、要素を変数にキャッシュ
+2.	見た目の変更はクラスで切替（JSは「何をするか」、CSSは「どう見せるか」を担当）
+3.	もう1回押すと元に戻る「トグル動作」に -->
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JS基礎：テキスト & CSS変更</title>
+  <style>
+    /* ▼表示エリアのベース見た目 */
+    #color-box {
+      width: 240px;
+      height: 120px;
+      background: lightblue;
+      color: black;
+      text-align: center;
+      line-height: 120px;
+      border-radius: 10px;
+      margin: 24px auto;
+      transition: background .2s ease, color .2s ease, transform .12s ease;
+    }
+
+    /* ▼「変更後」の見た目（ここだけをJSで付け外し） */
+    #color-box.is-active {
+      background: lightcoral;
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    /* 体験用のボタン見た目（任意） */
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      cursor: pointer;
+    }
+    button:hover { filter: brightness(1.03); }
+  </style>
+</head>
+<body>
+  <!-- ▼対象のボックス -->
+   <div id="color-box">色が変わります</div>
+  <!-- ▼操作ボタン -->
+   <div class="actions">
+    <button id="btn-toggle" aria-pressed="false">色を切り替える</button>
+    <button id="btn-reset">元に戻す</button>
+   </div>
+
+   <script>
+    // 1) 要素をキャッシュ（毎回DOMを検索しない）
+    const box = document.getElementById('color-box');
+    const btnToggle = document.getElementById('btn-toggle');
+    const btnReset = document.getElementById('btn-reset');
+
+    // 2) トグル動作：クラスを付け外しして見た目を切替
+    btnToggle.addEventListener('cklick', () => {
+      const active = box.classList.toggle('is-active'); // 付いたら true, 外れたら false
+      // テキストも合わせて切替（任意）
+      box.textContent = active ? '色が変わりました' : '色が変わります';
+      // アクセシビリティ：トグル状態をスクリーンリーダーに伝える
+      btnToggle.setAttribute('aria-pressed', String(active));
+    });
+
+    // 3) リセット動作：確実に元の状態へ
+    btnReset.addEventListener('click', () => {
+      box.classList.remove('is-active')
+      box.textContent = '色が変わります';
+      btnToggle.setAttribute('aria-pressed', 'False');
+    });
+   </script>
+</body>
+</html>
