@@ -1,0 +1,61 @@
+
+<!-- 
+ A. ORの例（ユーザー名チェック）
+  入力値を取得
+  もし「空文字」OR「3文字未満」ならエラー表示
+  それ以外はOK表示
+
+B. 三項演算子（スコア判定）
+  入力スコア >= 60 ? 「合格」 : 「不合格」
+
+C. for文（偶数リスト＆合計）
+  1〜Nまで繰り返し
+    偶数ならULに<li>追加
+    合計を加算
+  ULと合計を表示 
+-->
+
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>JS基礎：OR・三項演算子・for文</title>
+  <link rel="stylesheet" href="style5.css">
+</head>
+<body>
+  <main class="container">
+    <h1>JS基礎：OR・三項演算子・for文</h1>
+
+    <!-- A. OR（||）での入力チェック -->
+    <section class="card">
+      <h2>A. OR(||)で未入力 or 短すぎる判定</h2>
+      <label for="userName">ユーザー名（3文字以上）：</label>
+      <input type="text" id="userName" placeholder="例: taro">
+      <button id="btnOr">チェック</button>
+      <p id="msgOr" aria-live="polite"></p> <!-- 結果メッセージを出力する場所（初期は空白） -->
+    </section>
+
+    <!-- B. 三項演算子 -->
+    <section class="card">
+      <h2>B. 三項演算子で合否判定</h2>
+      <label for="score">スコア（0〜100）：</label>
+      <input type="number" id="score" min="0" max="100" placeholder="例: 75">
+      <button id="btnTernary">判定</button>
+      <p id="msgTernary" aria-live="polite"></p>  <!-- 結果メッセージを出力する場所（初期は空白） -->
+    </section>
+
+    <!-- C. for文 -->
+    <section class="card">
+      <h2>C. for文で偶数リストと合計</h2>
+      <label for="maxN">上限N：</label>
+      <input type="number" id="maxN" min="1" placeholder="例: 10">
+      <button id="btnFor">生成</button>
+      <ul id="list"></ul>
+      <p id="sum" class="sum"></p>  <!-- 結果メッセージを出力する場所（初期は空白） -->
+    </section>
+  </main>
+  
+  <script src="script5.js"></script>
+</body>
+</html>
