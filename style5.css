@@ -1,0 +1,40 @@
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  padding: 24px;
+  background: #f5f7fb;
+}
+
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin: 16px 0;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.56);
+}
+
+label {
+  display: inline-block;
+  min-width: 180px;
+  margin-right: 6px;
+}
+
+input, button {
+  padding: 8px 10px;
+  margin: 6px 4px;
+  font-size: 16px;
+}
+
+#msgOr, #msgTernary, .sum {
+  margin-top: 8px;
+  font-weight: bold;
+}
+
+ul#list {
+  margin-top: 8px;
+  padding: 20px;
+}

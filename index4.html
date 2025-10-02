@@ -1,0 +1,39 @@
+<!-- 
+ 年齢入力欄と「判定」ボタン、結果表示エリアを用意
+ボタンクリックで処理開始
+
+入力値を取り出す
+数値に変換
+もし数値でない/空なら「数値を入力してください」
+
+もし年齢 < 0 → 「無効な値」
+else if 0〜12 → 「子供料金」
+else if 13〜64 → 「大人料金」
+else if 65以上 → 「シニア料金」
+それ以外 → 「判定できません」
+
+（おまけ）10〜12歳は「ジュニア割あり」と注意書きを追加（論理演算子） 
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JS基礎：条件分岐の応用</title>
+  <link rel="stylesheet" href="style4.css">
+</head>
+<body>
+  <main class="container">
+  <h1>年齢による料金区分（条件分岐の練習）</h1>
+
+  <label for="ageInput">年齢：</label>
+  <input type="number" id="ageInput" placeholder="例: 30" inputmode="numeric">
+  <button id="judgeBtn" aria-pressed="false">判定</button>
+
+  <p id="result" aria-live="polite"></p>
+  <p id="note" class="note" aria-live="polite"></p>
+</main>
+
+<script src="script4.js"></script>
+</body>
+</html>
