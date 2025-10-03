@@ -1,0 +1,47 @@
+
+<!-- 
+フォームを作成（名前 / メール / パスワード）
+各フィールドの下にエラーメッセージ表示用 <span> を用意
+
+正規表現パターンを定義
+  nameRegex：^[ぁ-んァ-ヶｦ-ﾟa-zA-Z0-9 ]{3,20}$
+  emailRegex：^[^\s@]+@[^\s@]+\.[^\s@]+$
+  passwordRegex：^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!-/:-@[-`{-~]{8,}$
+
+各フィールドに input イベントを付与 → 入力のたびにチェック
+送信ボタンでは3項目すべてをチェックし、OKなら「送信成功！」、NGなら該当エラーを表示 
+-->
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>JS基礎：正規表現バリデーション</title>
+  <link rel="stylesheet" href="style8.css">
+</head>
+<body>
+  <main class="container">
+    <h1>ユーザー登録フォーム（Regex版）</h1>
+
+    <form id="registerForm" novalidate>
+      <label for="name">名前（3〜20文字）：</label>
+      <input type="text" id="name" placeholder="例: Yuki 123">
+      <span id="errorName" class="error"></span>
+
+      <label for="email">メール：</label>
+      <input type="email" id="email" placeholder="example@mail.com">
+      <span id="errorEmail" class="error"></span>
+
+      <label for="password">パスワード：</label>
+      <input type="password" id="password" placeholder="例: passw0rd">
+      <span id="errorPassword" class="error"></span>
+
+      <button type="submit">送信</button>
+    </form>
+
+    <p id="success"></p>
+  </main>
+
+  <script src="script8.js"></script>
+</body>
+</html>

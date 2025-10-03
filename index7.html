@@ -1,0 +1,49 @@
+
+<!-- 
+ フォームに3つのフィールド（名前、メール、パスワード）を用意
+それぞれの下にエラー表示用の <span> を配置
+
+送信ボタンを押したとき
+  各フィールドをチェック
+  条件を満たさなければエラーを表示（そのフィールドの下に）
+  条件を満たせば「OK」と表示（緑色）
+  入力欄の枠線も赤/緑に変更
+
+さらに
+  各フィールドに入力イベントを設定
+  入力中にリアルタイムで判定を行う
+-->
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>JS基礎：フィールドごとのバリデーション</title>
+  <link rel="stylesheet" href="style7.css">
+</head>
+<body>
+  <main class="container">
+    <h1>ユーザー登録フォーム（強化版）</h1>
+
+    <form id="registerForm" novalidate>
+      <label for="name">名前：</label>
+      <input type="text" id="name" placeholder="3文字以上">
+      <span id="errorName" class="error"></span>
+
+      <label for="email">メール：</label>
+      <input type="email" id="email" placeholder="example@mail.com">
+      <span id="errorEmail" class="error"></span>
+
+      <label for="password">パスワード：</label>
+      <input type="password" id="password" placeholder="6文字以上">
+      <span id="errorPassword" class="error"></span>
+
+      <button type="submit">送信</button>
+    </form>
+
+    <p id="success"></p>
+  </main>
+
+  <script src="script7.js"></script>
+</body>
+</html>

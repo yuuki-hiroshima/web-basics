@@ -1,0 +1,79 @@
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  padding: 24px;
+  background: #f5f7fb;
+}
+
+.container {
+  max-width: 520px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 22px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.58);
+}
+
+h1 { margin-top: 0; }
+
+label {
+  display: block;
+  margin-top: 12px;
+  font-weight: 700;
+}
+
+input {
+  width: 95%;
+  padding: 10px;
+  margin-top: 6px;
+  border: 2px solid #d7d9df;
+  outline: none;
+}
+
+input.error-border {
+  border-color: #e53935;
+  box-shadow: 0 0 0 3px rgba(229,57,63,.12);
+}
+
+input.success-border {
+  border-color: #2e7d32;
+  box-shadow: 0 0 0 3px rgba(46,125,50,.12);
+}
+
+.msg {
+  display: block;
+  margin-top: 6px;
+  font-size: 14px;
+  min-height: 20px;
+}
+
+.msg.error::before { content: "⚠️ "; }
+.msg.ok::before{ content: "✅️ "; }
+
+#submitBtn[disabled] {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+#success {
+  margin-top: 16px;
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+.linklike {
+  background: none;
+  border: none;
+  color: #0b66d0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-bottom: 8px;
+}
+
+.help {
+  background: #f1f7ff;
+  border: 1px solid #cfe2ff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>学校抗争RTS：道路・CPUランダム・プレイヤー指揮・型・制圧色継承</title>
+<style>
+  :root{
+    --bg:#0f1220; --panel:#171a2b; --text:#e8ecf1; --muted:#9aa3b2;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    display:flex; flex-direction:column; align-items:center; gap:8px; padding:10px 10px 20px;
+  }
+  h1{font-size:16px; font-weight:700; margin:6px 0 0; color:#cfe4ff}
+  .row{width:100%; max-width:980px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between}
+  .panel{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    background:var(--panel); padding:8px 10px; border-radius:12px; box-shadow:0 0 0 1px #1f2440 inset;
+  }
+  button, select, input[type="range"]{
+    background:#202746; color:var(--text); border:1px solid #2b345f; border-radius:10px; padding:6px 10px;
+  }
+  button:hover{filter:brightness(1.1); cursor:pointer}
+  .badge{display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; font-size:12px; background:#1b203a; border:1px solid #2b345f}
+  .dot{width:10px;height:10px;border-radius:50%}
+  .stat{background:var(--panel); padding:6px 10px; border-radius:10px; color:#9aa3b2; font-size:12px}
+  canvas{background:#0b0e1a; border-radius:14px; box-shadow:0 0 0 1px #1f2440 inset; display:block}
+  footer{color:#7f8aa3; font-size:12px; opacity:.85}
+  .legend-col{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="panel">
+      <button id="toggle">⏸︎ 一時停止</button>
+      <label>速度×<span id="speedLabel">1.0</span>
+        <input id="speed" type="range" min="0.2" max="3" value="1" step="0.1" style="vertical-align:middle;width:140px">
+      </label>
+      <button id="reset">🔄 リセット</button>
+    </div>
+    <div class="panel">
+      <label>プレイヤー校：
+        <select id="playerTeam"></select>
+      </label>
+      <span id="order" class="badge">指示先：-</span>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="panel legend-col" id="legend"></div>
+  </div>
+
+  <h1>学校抗争リアルタイム陣取り（道路／ランダムCPU／プレイヤー指揮／型／制圧色継承）</h1>
+  <canvas id="game" width="960" height="600"></canvas>
+  <div id="stats" class="stat">ユニット数: …</div>
+  <footer>学校をクリックで**進軍先を指示**できます（プレイヤー校のみ）。型（攻撃/防御/バランス/万能）の補正がかかります。</footer>
+
+<script>
+(() => {
+  // ====== 基本設定 ======
+  const CFG = {
+    canvasW: 960, canvasH: 600,
+    schoolRadius: 48,
+    captureThreshold: 12,    // 占拠必要「純滞在」秒
+    captureRate: 1.05,       // 1人での秒あたり進行
+    decayRate: 1.6,          // 所有側の押し戻し
+    baseSpawnInterval: 2.6,  // スポーン基準
+    maxUnitsPerTeam: 60,
+    roadWidth: 10,           // 道の見た目用
+    unit: {
+      speed: 60,             // px/s（基礎値）
+      sight: 85,
+      engageDist: 14,
+      hp: 100,
+      dps: 22
+    },
+    cpuRetargetMin: 8,       // CPUが進軍先を再抽選する間隔（秒）
+    cpuRetargetMax: 14
+  };
+
+  // ====== チーム & 学校 定義 ======
+  // 各校に「型」アーキタイプを付与：攻撃/防御/バランス/万能
+  const ARCH = {
+    攻撃型:   { hp:0.9, dps:1.25, speed:1.05, spawn:0.95, defense:0.95, decay:0.95 },
+    防御型:   { hp:1.25,dps:0.9,  speed:0.95, spawn:1.05, defense:1.2,  decay:1.15 },
+    バランス型:{ hp:1.0, dps:1.0,  speed:1.0,  spawn:1.0,  defense:1.0,  decay:1.0  },
+    万能型:   { hp:1.1, dps:1.1,  speed:1.05, spawn:0.95, defense:1.05, decay:1.05 },
+  };
+
+  const TEAMS = [
+    { id:0, name:"紅陽高校", color:"#f14b4b", archetype:"攻撃型" },
+    { id:1, name:"蒼嶺高校", color:"#4b8bf1", archetype:"防御型" },
+    { id:2, name:"翠栄高校", color:"#36c07f", archetype:"バランス型" },
+    { id:3, name:"黄翔高校", color:"#f1c24b", archetype:"万能型" },
+  ];
+
+  // ====== 道路グラフ ======
+  // 角（学校）＋中央＋十字ノードを用意し、全ルートはノード列の最短経路で進行
+  const ROAD_NODES = [
+    // 0-3: 学校ノード（座標は後で初期化時に上書き）
+    {id:0,x:120,y:120}, {id:1,x:840,y:120}, {id:2,x:120,y:480}, {id:3,x:840,y:480},
+    // 4-8: 中央十字
+    {id:4,x:480,y:120}, {id:5,x:480,y:300}, {id:6,x:480,y:480}, {id:7,x:120,y:300}, {id:8,x:840,y:300},
+  ];
+  const ROAD_EDGES = [
+    [0,4],[4,1], // 上辺横
+    [2,6],[6,3], // 下辺横
+    [7,5],[5,8], // 中央横
+    [4,5],[5,6], // 縦中央
+    [0,7],[2,7], // 左縦
+    [1,8],[3,8], // 右縦
+    // 斜め（対角の近道）
+    [0,5],[1,5],[2,5],[3,5]
+  ];
+
+  // ========= ユーティリティ =========
+  const rand = (a,b)=>a+Math.random()*(b-a);
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+
+  // Dijkstra（小規模グラフなので素朴実装）
+  function shortestPath(nodes, edges, startId, goalId){
+    const N = nodes.length;
+    const adj = Array.from({length:N},()=>[]);
+    for(const [a,b] of edges){
+      const na = nodes[a], nb = nodes[b];
+      const w = Math.hypot(na.x-nb.x, na.y-nb.y);
+      adj[a].push({to:b,w}); adj[b].push({to:a,w});
+    }
+    const D=Array(N).fill(Infinity), prev=Array(N).fill(-1), used=Array(N).fill(false);
+    D[startId]=0;
+    for(let _=0;_<N;_++){
+      let v=-1; let best=Infinity;
+      for(let i=0;i<N;i++){ if(!used[i] && D[i]<best){best=D[i]; v=i;} }
+      if(v===-1) break;
+      used[v]=true;
+      for(const e of adj[v]){
+        if(D[e.to] > D[v]+e.w){ D[e.to]=D[v]+e.w; prev[e.to]=v; }
+      }
+    }
+    if(D[goalId]===Infinity) return [];
+    const path=[goalId]; let cur=goalId;
+    while(prev[cur]!==-1){ cur=prev[cur]; path.push(cur); }
+    path.reverse();
+    return path.map(i=>nodes[i]);
+  }
+
+  // ========= モデル =========
+  class Unit {
+    constructor(team, x, y, mods){
+      this.team = team;
+      this.x = x; this.y = y;
+      this.hpMax = CFG.unit.hp * mods.hp;
+      this.hp = this.hpMax;
+      this.dps = CFG.unit.dps * mods.dps;
+      this.speed = CFG.unit.speed * mods.speed;
+      this.sight = CFG.unit.sight;
+      this.engageDist = CFG.unit.engageDist;
+      this.r = 5.5;
+      this.path = [];    // 道ノード列（{x,y}配列）
+      this.pathIdx = 0;
+      this.targetEnemy = null;
+    }
+    setPath(pathNodes){
+      this.path = pathNodes.map(n=>({x:n.x,y:n.y}));
+      this.pathIdx = 0;
+    }
+    update(dt, world){
+      if(this.hp<=0) return;
+
+      // 索敵 → 交戦
+      const nearEnemy = world.findNearestEnemy(this);
+      if(nearEnemy && dist(this,nearEnemy) <= this.sight){
+        this.targetEnemy = nearEnemy;
+      } else if(this.targetEnemy && this.targetEnemy.hp<=0){
+        this.targetEnemy = null;
+      }
+      if(this.targetEnemy && dist(this,this.targetEnemy) <= this.engageDist){
+        // 防衛ボーナス：学校円内にいる側に防御補正
+        const defBonusA = world.defenseBonusAt(this);
+        const defBonusB = world.defenseBonusAt(this.targetEnemy);
+        // 互いにダメージ（相手に与える＝自分のDPS × 相手の被ダメ倍率）
+        this.targetEnemy.hp -= this.dps * dt * defBonusB; // 相手が守勢なら減りにくい
+        this.hp            -= this.targetEnemy.dps * dt * defBonusA;
+        return;
+      }
+
+      // 経路に沿って移動（ターゲット学校に紐づく道路最短路）
+      if(!this.path || this.path.length===0){
+        // プレイヤー/CPUのチーム目標を反映して経路再計算
+        world.assignPathToTarget(this);
+      }
+      const p = this.path[this.pathIdx];
+      if(p){
+        const dx = p.x - this.x, dy = p.y - this.y;
+        const d = Math.hypot(dx,dy);
+        if(d < 4){ // 次ノードへ
+          this.pathIdx++;
+        } else {
+          const v = this.speed * world.speed;
+          this.x += (dx/d) * v * dt;
+          this.y += (dy/d) * v * dt;
+        }
+      } else {
+        // 目標学校へ直進（最終到達）
+        const tgt = world.getTeamTargetSchool(this.team) ?? world.findFallbackEnemySchool(this.team);
+        if(tgt){
+          const dx=tgt.x-this.x, dy=tgt.y-this.y, d=Math.hypot(dx,dy);
+          if(d>0.0001){
+            const v=this.speed*world.speed;
+            this.x += (dx/d)*v*dt;
+            this.y += (dy/d)*v*dt;
+          }
+        }
+      }
+
+      // 画面外補正
+      this.x = clamp(this.x, 8, world.w-8);
+      this.y = clamp(this.y, 8, world.h-8);
+    }
+    draw(g, color){
+      g.fillStyle = color;
+      g.beginPath(); g.arc(this.x, this.y, this.r, 0, Math.PI*2); g.fill();
+      // HPバー
+      const w=14, h=3;
+      g.fillStyle = "#00000066";
+      g.fillRect(this.x - w/2, this.y - 10, w, h);
+      const ratio = clamp(this.hp / this.hpMax, 0, 1);
+      g.fillStyle = "#ffffffb0";
+      g.fillRect(this.x - w/2, this.y - 10, w*ratio, h);
+    }
+  }
+
+  class School {
+    constructor(teamDef, x, y){
+      this.name = teamDef.name;
+      this.color = teamDef.color;
+      this.x = x; this.y = y;
+      this.owner = teamDef.id;
+      this.capture = 0;
+      this.archetype = teamDef.archetype;
+      this.spawnBase = CFG.baseSpawnInterval;
+      this.spawnTimer = rand(0, this.spawnIntervalForOwner()); // 初回ばらけ
+    }
+    spawnIntervalForOwner(){
+      const mods = archMods(this.owner);
+      return this.spawnBase * mods.spawn;
+    }
+    update(dt, world){
+      // スポーン
+      this.spawnTimer -= dt * world.speed;
+      const myCount = world.countUnits(this.owner);
+      if(this.spawnTimer <= 0 && myCount < CFG.maxUnitsPerTeam){
+        world.spawnUnit(this.owner, this.x + rand(-18,18), this.y + rand(-18,18));
+        this.spawnTimer += this.spawnIntervalForOwner();
+      }
+
+      // 占拠ロジック
+      const attackers = world.units.filter(u => u.team!==this.owner && dist(u,this)<=CFG.schoolRadius);
+      const defenders = world.units.filter(u => u.team===this.owner && dist(u,this)<=CFG.schoolRadius);
+
+      const T = CFG.captureThreshold;
+      if(attackers.length>0 && defenders.length===0){
+        // 敵のみ → ゲージは敵方向へ進む
+        this.capture -= CFG.captureRate * world.speed * dt * attackers.length;
+      } else {
+        // 押し戻し（所有チームの「防御型」等により強くなる）
+        const decay = CFG.decayRate * archMods(this.owner).decay;
+        if(this.capture < 0){
+          this.capture = Math.min(0, this.capture + decay * world.speed * dt);
+        } else if (this.capture > 0){
+          this.capture = Math.max(0, this.capture - decay * world.speed * dt);
+        }
+      }
+
+      // 閾値を超えたら所有者切替（＝制圧色継承）
+      if(this.capture <= -T){
+        const newOwner = this.getStrongestAttackerTeam(world) ?? this.owner;
+        this.owner = newOwner;
+        this.color = world.palette[newOwner].fill; // 色を制圧側に合わせる
+        this.capture = 0;
+        // リスポーン間隔も新陣営の型で変わる
+        this.spawnTimer = this.spawnIntervalForOwner();
+      }
+    }
+    getStrongestAttackerTeam(world){
+      const counts = new Map();
+      for(const u of world.units){
+        if(u.team===this.owner) continue;
+        if(dist(u,this)<=CFG.schoolRadius){
+          counts.set(u.team, (counts.get(u.team)||0)+1);
+        }
+      }
+      let best=null, bestN=-1;
+      for(const [team,n] of counts){
+        if(n>bestN){bestN=n; best=team;}
+      }
+      return best;
+    }
+    draw(g, palette){
+      // 所有色の本体
+      g.beginPath();
+      g.fillStyle = palette[this.owner].fill;
+      g.strokeStyle = "#00000055";
+      g.lineWidth = 2;
+      g.arc(this.x, this.y, CFG.schoolRadius, 0, Math.PI*2);
+      g.fill(); g.stroke();
+
+      // 学校名＋型
+      g.fillStyle="#0b0e1a"; g.font="700 13px system-ui, -apple-system";
+      g.textAlign="center"; g.textBaseline="middle";
+      g.fillText(`${this.name}`, this.x, this.y-6);
+      g.font="600 11px system-ui, -apple-system";
+      g.fillText(`(${this.archetype})`, this.x, this.y+10);
+
+      // キャプチャリングのリング
+      const ratio = clamp(Math.abs(this.capture)/CFG.captureThreshold, 0, 1);
+      if(ratio>0){
+        g.strokeStyle="#ffffffc0"; g.lineWidth=4;
+        g.beginPath();
+        g.arc(this.x, this.y, CFG.schoolRadius+6, -Math.PI/2, -Math.PI/2 + Math.PI*2*ratio);
+        g.stroke();
+      }
+    }
+  }
+
+  // 型補正を取得
+  function archMods(teamId){
+    const arch = TEAMS[teamId]?.archetype ?? "バランス型";
+    return ARCH[arch] ?? ARCH["バランス型"];
+  }
+
+  // ========= ワールド =========
+  class World {
+    constructor(canvas){
+      this.canvas = canvas;
+      this.g = canvas.getContext("2d");
+      this.w = canvas.width; this.h = canvas.height;
+      this.time = 0;
+      this.speed = 1.0;
+      this.running = true;
+
+      this.units = [];
+      this.schools = [];
+      this.palette = TEAMS.map(t=>({fill:t.color}));
+      this.teamTargetSchoolId = [1,2,3,0]; // 各チームの現在の進軍先（初期値）
+      this.cpuTimers = [0,0,0,0];          // 再抽選タイマ
+      this.playerTeam = 0;                 // UIで変更可能
+    }
+    setup(){
+      this.units.length = 0;
+      // 学校配置（角）
+      const s0 = new School(TEAMS[0], 120, 120);
+      const s1 = new School(TEAMS[1], this.w-120, 120);
+      const s2 = new School(TEAMS[2], 120, this.h-120);
+      const s3 = new School(TEAMS[3], this.w-120, this.h-120);
+      this.schools = [s0,s1,s2,s3];
+
+      // ROAD_NODESの0-3を学校座標で上書き
+      ROAD_NODES[0].x=s0.x; ROAD_NODES[0].y=s0.y;
+      ROAD_NODES[1].x=s1.x; ROAD_NODES[1].y=s1.y;
+      ROAD_NODES[2].x=s2.x; ROAD_NODES[2].y=s2.y;
+      ROAD_NODES[3].x=s3.x; ROAD_NODES[3].y=s3.y;
+
+      // 初期ユニット
+      for(let t=0;t<4;t++){
+        for(let i=0;i<6;i++){
+          const sc = this.schools[t];
+          this.spawnUnit(t, sc.x+rand(-22,22), sc.y+rand(-22,22));
+        }
+      }
+
+      // CPU再抽選タイマ初期化
+      for(let t=0;t<4;t++){
+        this.cpuTimers[t] = rand(CFG.cpuRetargetMin, CFG.cpuRetargetMax);
+      }
+    }
+    spawnUnit(team,x,y){
+      const mods = archMods(team);
+      const u = new Unit(team,x,y,mods);
+      // 進軍先に基づく経路を設定
+      this.assignPathToTarget(u);
+      this.units.push(u);
+    }
+    countUnits(team){
+      return this.units.reduce((a,u)=>a+(u.team===team?1:0),0);
+    }
+    findNearestEnemy(u){
+      let best=null, bestD=Infinity;
+      for(const e of this.units){
+        if(e===u || e.hp<=0 || e.team===u.team) continue;
+        const d = Math.hypot(u.x-e.x, u.y-e.y);
+        if(d<bestD){bestD=d; best=e;}
+      }
+      return best;
+    }
+    getTeamTargetSchool(team){
+      const id = this.teamTargetSchoolId[team];
+      if(id==null) return null;
+      return this.schools[id];
+    }
+    findFallbackEnemySchool(team){
+      // 何らかの理由でターゲットが無効なら最も近い敵校
+      let best=null, bestD=Infinity;
+      for(let i=0;i<this.schools.length;i++){
+        const s=this.schools[i];
+        if(s.owner === team) continue;
+        const d=Math.hypot(s.x- this.schools[team].x, s.y- this.schools[team].y);
+        if(d<bestD){bestD=d; best=s;}
+      }
+      return best;
+    }
+    assignPathToTarget(u){
+      // 最寄りの道路ノード（出発）と、目標学校のノード（0-3のいずれか）
+      const startId = nearestNodeId(u.x,u.y);
+      const tgtSchool = this.getTeamTargetSchool(u.team) ?? this.findFallbackEnemySchool(u.team);
+      if(!tgtSchool) { u.setPath([]); return; }
+      const goalId = this.schools.indexOf(tgtSchool); // 0-3に対応
+      const path = shortestPath(ROAD_NODES, ROAD_EDGES, startId, goalId);
+      u.setPath(path);
+    }
+    defenseBonusAt(u){
+      // 学校円内にいる場合、その学校の所有者側に防御補正（被ダメ倍率を下げる）
+      for(const s of this.schools){
+        if(dist(u,s)<=CFG.schoolRadius){
+          if(u.team === s.owner){
+            return 1/ARCH[TEAMS[s.owner].archetype].defense; // 防御型ほど小さくなる
+          }
+        }
+      }
+      return 1.0;
+    }
+    update(dt){
+      // 学校/ユニット更新
+      for(const s of this.schools) s.update(dt, this);
+      for(const u of this.units) u.update(dt, this);
+      // 死亡除去
+      this.units = this.units.filter(u=>u.hp>0);
+
+      // CPUターゲティング（プレイヤー以外のチーム）
+      for(let t=0;t<4;t++){
+        if(t===this.playerTeam) continue;
+        this.cpuTimers[t] -= dt * this.speed;
+        if(this.cpuTimers[t] <= 0){
+          this.retargRandom(t);
+          this.cpuTimers[t] = rand(CFG.cpuRetargetMin, CFG.cpuRetargetMax);
+        }
+      }
+
+      this.time += dt;
+    }
+    retargRandom(team){
+      const enemies = this.schools
+        .map((s,i)=>({s,i}))
+        .filter(o=>o.s.owner!==team);
+      if(enemies.length===0) return;
+      const pick = enemies[Math.floor(Math.random()*enemies.length)].i;
+      this.teamTargetSchoolId[team] = pick;
+      // 既存ユニットにも新ルートを再付与（軽量化のため近傍だけでも可だが今回は全体）
+      for(const u of this.units) if(u.team===team){ this.assignPathToTarget(u); }
+    }
+    drawRoads(){
+      const g=this.g;
+      g.save();
+      // 道の下地
+      g.strokeStyle="#202742";
+      g.lineWidth = CFG.roadWidth+6;
+      g.lineCap="round";
+      g.lineJoin="round";
+      g.beginPath();
+      for(const [a,b] of ROAD_EDGES){
+        const A=ROAD_NODES[a], B=ROAD_NODES[b];
+        g.moveTo(A.x, A.y); g.lineTo(B.x, B.y);
+      }
+      g.stroke();
+      // 道の本体
+      g.strokeStyle="#2a325b";
+      g.lineWidth = CFG.roadWidth;
+      g.beginPath();
+      for(const [a,b] of ROAD_EDGES){
+        const A=ROAD_NODES[a], B=ROAD_NODES[b];
+        g.moveTo(A.x, A.y); g.lineTo(B.x, B.y);
+      }
+      g.stroke();
+      g.restore();
+    }
+    draw(){
+      const g=this.g;
+      g.clearRect(0,0,this.w,this.h);
+
+      // 背景の薄グリッド
+      g.save();
+      g.strokeStyle="#141a2a"; g.lineWidth=1;
+      for(let x=0;x<=this.w;x+=40){ g.beginPath(); g.moveTo(x,0); g.lineTo(x,this.h); g.stroke(); }
+      for(let y=0;y<=this.h;y+=40){ g.beginPath(); g.moveTo(0,y); g.lineTo(this.w,y); g.stroke(); }
+      g.restore();
+
+      // 道路
+      this.drawRoads();
+
+      // 進軍先ライン（各チームの現在のターゲット）
+      g.save();
+      g.setLineDash([6,6]); g.lineWidth=2; g.strokeStyle="#ffffff33";
+      for(let t=0;t<4;t++){
+        const src = this.schools[t];
+        const dst = this.schools[this.teamTargetSchoolId[t]];
+        if(src && dst && src!==dst){
+          g.beginPath(); g.moveTo(src.x,src.y); g.lineTo(dst.x,dst.y); g.stroke();
+        }
+      }
+      g.restore();
+
+      // 学校
+      for(const s of this.schools) s.draw(g, this.palette);
+
+      // ユニット
+      for(const u of this.units){ u.draw(g, this.palette[u.team].fill); }
+    }
+  }
+
+  // 最寄りノードID
+  function nearestNodeId(x,y){
+    let best=-1, bestD=Infinity;
+    for(const n of ROAD_NODES){
+      const d=Math.hypot(x-n.x,y-n.y);
+      if(d<bestD){bestD=d; best=n.id;}
+    }
+    return best;
+  }
+
+  // ====== 実行部 ======
+  const canvas = document.getElementById("game");
+  const world = new World(canvas);
+  world.setup();
+
+  let last = performance.now();
+  function loop(now){
+    const dt = Math.min(0.033, (now - last) / 1000);
+    last = now;
+    if(world.running){
+      world.update(dt);
+      world.draw();
+      updateStats();
+    } else {
+      world.draw();
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  // ====== UI ======
+  const $toggle = document.getElementById("toggle");
+  const $speed = document.getElementById("speed");
+  const $speedLabel = document.getElementById("speedLabel");
+  const $reset = document.getElementById("reset");
+  const $stats = document.getElementById("stats");
+  const $playerTeam = document.getElementById("playerTeam");
+  const $order = document.getElementById("order");
+  const $legend = document.getElementById("legend");
+
+  // レジェンドとプレイヤー選択
+  function setupLegend(){
+    $legend.innerHTML = "";
+    TEAMS.forEach(t=>{
+      const span = document.createElement("span");
+      span.className="badge";
+      span.innerHTML = `<span class="dot" style="background:${t.color}"></span>${t.name}（${t.archetype}）`;
+      $legend.appendChild(span);
+    });
+    $playerTeam.innerHTML = TEAMS.map(t=>`<option value="${t.id}">${t.name}</option>`).join("");
+    $playerTeam.value = world.playerTeam;
+  }
+  setupLegend();
+
+  function updateStats(){
+    const counts = [0,0,0,0];
+    for(const u of world.units) counts[u.team]++;
+    const owners = world.schools.map(s=>s.owner);
+    const ownerStr = owners.map(o=>TEAMS[o].name.replace("高校","")).join(" / ");
+    const target = world.getTeamTargetSchool(world.playerTeam);
+    $stats.textContent = `ユニット数：紅陽 ${counts[0]}｜蒼嶺 ${counts[1]}｜翠栄 ${counts[2]}｜黄翔 ${counts[3]}　｜　所有：${ownerStr}`;
+    $order.textContent = `指示先：${target ? target.name : "-"}`;
+  }
+
+  $toggle.onclick = ()=>{
+    world.running = !world.running;
+    $toggle.textContent = world.running ? "⏸︎ 一時停止" : "▶ 再開";
+  };
+  $speed.oninput = ()=>{
+    world.speed = parseFloat($speed.value);
+    $speedLabel.textContent = world.speed.toFixed(1);
+  };
+  $reset.onclick = ()=>{
+    world.setup();
+  };
+  $playerTeam.onchange = ()=>{
+    world.playerTeam = parseInt($playerTeam.value,10);
+  };
+
+  // クリックでプレイヤー指示
+  canvas.addEventListener("click",(e)=>{
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (canvas.width/rect.width);
+    const y = (e.clientY - rect.top) * (canvas.height/rect.height);
+    // クリック位置に最も近い学校を取得（半径+20以内）
+    let targetId=-1, best=Infinity;
+    world.schools.forEach((s,i)=>{
+      const d=Math.hypot(x-s.x,y-s.y);
+      if(d<best && d<=CFG.schoolRadius+20){ best=d; targetId=i; }
+    });
+    if(targetId>=0){
+      // 自分の学校以外を指示（自陣クリックならスルー）
+      if(targetId !== world.playerTeam){
+        world.teamTargetSchoolId[world.playerTeam] = targetId;
+        for(const u of world.units) if(u.team===world.playerTeam){ world.assignPathToTarget(u); }
+      }
+    }
+  });
+
+  // キー操作
+  window.addEventListener("keydown",(e)=>{
+    if(e.code==="Space"){ e.preventDefault(); $toggle.click(); }
+    if(e.key==="1"){ $speed.value="1"; $speed.oninput(); }
+    if(e.key==="2"){ $speed.value="1.5"; $speed.oninput(); }
+    if(e.key==="3"){ $speed.value="2.0"; $speed.oninput(); }
+  });
+})();
+</script>
+</body>
+</html>
