@@ -1,0 +1,57 @@
+
+<!--
+フォームを用意（名前/メール/パス） + 送信ボタン（最初はdisabled）
+各入力の下にエリア（span）を用意：aria-live/role="alert"で即時読み上げ
+「ヘルプ表示」ボタンでヒントの開閉
+
+正規表現パターンを定義
+各フィールドの input で検証 → エラー文/OK表示・枠色・aria-invalid を更新
+全フィールドOKのたびに submitボタンのdisabledを切り替え
+
+submit時：
+  全チェックを再評価 → OKなら成功メッセージ表示（role="status"）
+  NGなら最初のエラーへフォーカス 
+-->
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>完成版フォーム：UX + A11y + 送信制御</title>
+  <link rel="stylesheet" href="style9.css">
+</head>
+<body>
+  <main class="container">
+    <h1>ユーザー登録フォーム（完成版）</h1>
+
+    <button id="toggleHelp" class="linklike" aria-expanded="false" aria-controls="helpText">ヘルプを表示</button>
+    <div id="helpText" class="help" hidden>
+      <ul>
+        <li><strong>名前</strong>：3〜20文字（ひらがな/カタカナ/英数字/半角スペース）</li>
+        <li><strong>メール</strong>：name@domain.tld 形式</li>
+        <li><strong>パスワード</strong>：8文字以上、英字と数字を各1つ以上</li>
+      </ul>
+    </div>
+
+    <form id="registerForm" novalidate>
+      <label for="name">名前：</label>
+      <input type="text" id="name" placeholder="例: Yuki 123" aria-invalid="false">
+      <span id="errorName" class="msg" role="alert" aria-live="polite"></span>
+
+      <label for="email">メール：</label>
+      <input type="email" id="email" placeholder="example@mail.com" aria-invalid="false">
+      <span id="errorEmail" class="msg" role="alert" aria-live="polite"></span>
+
+      <label for="password">パスワード：</label>
+      <input type="password" id="password" placeholder="8文字以上・英数字混在" aria-invalid="false">
+      <span id="errorPassword" class="msg" role="alert" aria-live="polite" ></span>
+
+      <button type="submit" id="submitBtn" disabled>送信</button>
+    </form>
+
+    <p id="success" role="status" aria-live="polite"></p>
+  </main>
+  
+  <script src="script9.js"></script>
+</body>
+</html>

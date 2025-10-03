@@ -1,0 +1,54 @@
+
+<!-- 
+ フォームに 名前 / メール / パスワード の入力欄を用意
+「送信」ボタンを押したらチェック処理を実行
+
+入力された値を取得
+エラーを格納する変数 errors を用意
+
+もし 名前が空 または 3文字未満なら
+    errors に「名前は3文字以上必要です」を追加
+
+もし メールが空 または @を含まないなら
+    errors に「正しいメールアドレスを入力してください」を追加
+
+もし パスワードが空 または 6文字未満なら
+    errors に「パスワードは6文字以上必要です」を追加
+
+もし errors に1つでも内容があれば
+    エラーメッセージを一覧表示して処理終了
+そうでなければ
+    「送信成功！」と表示 
+-->
+
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>JS基礎：フォームバリデーション</title>
+  <link rel="stylesheet" href="style6.css">
+</head>
+<body>
+  <main class="container">
+    <h1>ユーザー登録フォーム</h1>
+    <form id="registerForm" novalidate>
+      <label for="name">名前：</label>
+      <input type="text" id="name" placeholder="3文字以上">
+
+      <label for="email">メール：</label>
+      <input type="email" id="email" placeholder="example@mail.com">
+
+      <label for="password">パスワード：</label>
+      <input type="password" id="password" placeholder="6文字以上">
+
+      <button type="submit">送信</button>
+    </form>
+
+    <div id="errors"></div>
+    <p id="success"></p>
+  </main>
+
+  <script src="script6.js"></script>
+</body>
+</html>

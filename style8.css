@@ -1,0 +1,65 @@
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  padding: 24px;
+  background: #f5f7fb;
+}
+
+.container {
+  max-width: 520px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.58);
+}
+
+label {
+  display: block;
+  margin-top: 12px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+input.error-border { border-color: red; }
+input.success-color { border-color: green; }
+
+.error {
+  display: block;
+  margin-top: 4px;
+  color: red;
+  font-size: 14px;
+}
+
+button {
+  margin-top: 16px;
+  padding: 10px 20px;
+  background: #0078d7;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover { 
+  background: #005fa3;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 20px rgba(0,0,0,0.38);
+}
+
+button:active {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 20px rgba(0,0,0,0.58);
+}
+
+#success {
+  margin-top: 16px;
+  color: green;
+  font-weight: bold;
+}
