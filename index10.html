@@ -1,0 +1,58 @@
+
+<!-- 
+ 空の配列 users を用意
+
+フォーム（名前・メール）を作る
+「追加」ボタンを押したら処理開始
+
+入力された名前とメールをオブジェクトにする
+    { name: 入力された名前, email: 入力されたメール }
+
+配列 users に push で追加する
+
+配列の内容をテーブルに描画する
+    forEach で配列を回して、<tr><td>name</td><td>email</td></tr> を作る
+-->
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>配列とオブジェクトの基礎</title>
+  <link rel="stylesheet" href="style10.css">
+</head>
+<body>
+  <main class="container">
+    <h1>ユーザー登録リスト</h1>
+    <label for="search">検索（名前・メール）：</label>
+    <input type="text" id="search" placeholder="例; taro / mail.com">
+
+    <form id="userForm" novalidate>
+      <label for="name">名前：</label>
+      <input type="text" id="name" required>
+
+      <label for="email">メール：</label>
+      <input type="email" id="email" required>
+
+      <button type="submit">追加</button>
+    </form>
+
+    <p id="count"></p>
+
+    <table id="userTable">
+      <thead>
+        <tr>
+          <th>名前</th>
+          <th>メール</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- ここにJSで追加 -->
+      </tbody>
+    </table>
+  </main>
+
+  <script src="script10.js"></script>
+</body>
+</html>
